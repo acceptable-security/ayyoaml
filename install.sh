@@ -1,12 +1,15 @@
 #!/bin/bash
 
-echo "~ Installing kawaiistream! ~"
+echo "~ Installing ayyoa.ml! ~"
 
 if [[ $(id -u) -ne 0 ]] ; then echo "Please run as root" ; exit 1 ; fi
 
 echo "~ Getting dependencies ~"
 sudo apt-get install -y make git tar
 sudo apt-get install -y libpcre3-dev libpcre++-dev libssl-dev
+sudo apt-get install -y python-setuptools python-pip
+sudo pip install flask
+
 
 echo "~ Downloading nginx 1.11.6 ~"
 sudo wget -P /tmp http://nginx.org/download/nginx-1.11.6.tar.gz

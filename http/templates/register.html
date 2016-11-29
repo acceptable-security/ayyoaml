@@ -1,19 +1,23 @@
 {% extends "layout.html" %}
 {% block body %}
+    {% if error %}
+        <p style="color: red;">{{ error }}</p>
+    {% endif %}
+
     <p>Please enter your login credentials</p>
 
     <form action="{{ url_for("register") }}" method="POST">
         <table>
             <tr>
-                <td>Username:</td> <td><input type="text" id="username" required /></td>
+                <td>Username:</td> <td><input type="text" id="username" name="username" required /></td>
             </tr>
 
             <tr>
-                <td>Password:</td> <td><input type="password" id="password" required /></td>
+                <td>Password:</td> <td><input type="password" id="password" name="password" required /></td>
             </tr>
 
             <tr>
-                <td>Retype your Password:</td> <td><input type="retypepassword" id="retypepassword" required /></td>
+                <td>Retype your Password:</td> <td><input type="password" id="retypepassword" name="retypepassword" required /></td>
             </tr>
 
             <tr>

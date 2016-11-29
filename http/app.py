@@ -1,6 +1,7 @@
-from flask import Flask, render_template, request
+from flask import Flask, render_template, request, session, redirect, url_for
 import os
 from db import ayydb
+from datetime import datetime
 
 app = Flask(__name__)
 db = ayydb("database.db")
@@ -17,14 +18,19 @@ def rtmp_end():
 # Login infrmation
 @app.route("/login", methods=["GET", "POST"])
 def login():
+    if 'session_id' in session:
+        return redirect(url_for('index'))
+
     if request.method == "POST":
+        print request.form
         username = request.form['username']
         password = request.form['password']
 
-        session_id = db.check_login(username, password)
+        session_id = db.try_login(username, password)
 
         if session_id is not "":
-            session.session_id = session_id
+            session['session_id'] = session_id
+            session['username'] = username
             return redirect(url_for('index')) # TODO - User page?
         else:
             return render_template("login.html", error="Invalid user credentials.")
@@ -34,12 +40,26 @@ def login():
 @app.route("/logout")
 def logout():
     session.pop('session_id', None)
+    session.pop('username', None)
     return redirect(url_for("index"))
 
 @app.route("/register", methods=["GET", "POST"])
 def register():
     if request.method == "POST":
-        return "no"
+        username = request.form['username']
+        password = request.form['password']
+        retypepassword = request.form['retypepassword']
+
+        if password != retypepassword:
+            return render_template("register.html", error="Please input matching passwords.")
+
+        # TODO - Easier ask for email or forget about this
+        success = db.register_user(username, username + "@ayyoa.ml", password)
+
+        if success:
+            return redirect(url_for('login'))
+        else:
+            return render_template("register.html", error="Unable to use those credentials to register.")
     else:
         return render_template("register.html")
 
@@ -58,12 +78,23 @@ def stream(id):
 
 @app.route("/")
 def index():
-    return render_template("index.html", streams = [
-        { "name": "Test", "streamer": "Brian", "url": "weiner" },
-        { "name": "Test", "streamer": "[]----[]", "url": "weiner" },
-        { "name": "Test", "streamer": "Your face", "url": "weiner" },
-        { "name": "Test", "streamer": "jK!", "url": "weiner" }
-    ])
+    streams = db.get_active_streams()
+    to_render = []
+
+    for stream in streams:
+        idhash = stream[2]
+        user = db.get_idhash(idhash)
+
+        if not user:
+            continue
+
+        to.render_push({
+            "name": stream[1],
+            "streamer": user[1],
+            "url": str(stream[0])
+        })
+
+    return render_template("index.html", streams=to_render)
 
 if __name__ == "__main__":
     app.secret_key = "!Y()_{#QUPWROI:KLU!{_(UQPWO#!Y)*@#(IOUWEQJLKSA)}}"

@@ -6,7 +6,11 @@
 
     <body>
         <div id="main">
-            <h1>ayy oa.ml</h1>
+            {% if session.username %}
+                <h1>ayy oa.ml - <b>{{ session.username }}</b></h1>
+            {% else %}
+                <h1>ayy oa.ml</h1>
+            {% endif %}
 
             <div id="links">
                 <span class="link">
