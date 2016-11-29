@@ -1,0 +1,13 @@
+{% extends "layout.html" %}
+{% block body %}
+    <p>Current active streams:</p>
+    <ul>
+        {% for stream in streams %}
+            <li>
+                <p>
+                    <b>{{ stream['streamer'] }}</b> is streaming <a href="{{ stream['url'] }}">{{ stream['name'] }}</a>
+                </p>
+            </li>
+        {% endfor %}
+    </ul>
+{% endblock %}
